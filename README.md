@@ -11,3 +11,5 @@ Should the ship gets off the path, a game over screen appears, offering the user
 ## To-do list
 * Add a leaderboard
 * Make the game speed increases as the time goes
+
+Project made during the [Développeur Python | Formation Complète 2023](https://www.udemy.com/course/developpeur-python-formation-complete/) online course.
