@@ -1,3 +1,6 @@
+from os import chdir
+import sys
+import random
 from kivy.config import Config
 
 Config.set("graphics", "width", "1400")
@@ -15,6 +18,9 @@ from kivy.uix.widget import Widget
 from kivy.graphics import Color, Line, Quad, Triangle
 from kivy.lang import Builder
 from kivy.uix.relativelayout import RelativeLayout
+
+# chdir(sys._MEIPASS) # Set the working folder
+# print("le repertoire temporaire est : " + sys._MEIPASS) # for debug line
 
 Builder.load_file("menu.kv")
 
@@ -167,40 +173,40 @@ class MainWidget(RelativeLayout):
         last_x = 0
         last_y = 0
 
-        # Nettoie les tiles sorties de l'écran
+        # Clear the tiles that went off screen
         for i in range(len(self.tiles_coordinates) - 1, -1, -1):
             if self.tiles_coordinates[i][1] < self.current_y_loop:
                 del self.tiles_coordinates[i]
 
-        #  Génère les nouvelles tiles
+        #  Generate new tiles
 
-        #  Obtient les dernières coordonnées
+        #  Obtain last tile coordinates
         if len(self.tiles_coordinates) > 0:
             last_coordinate = self.tiles_coordinates[-1]
             last_x = last_coordinate[0]
             last_y = last_coordinate[1] + 1
 
         for i in range(len(self.tiles_coordinates), self.NB_TILES):
-            r = random.randint(0, 2)  # Choisi une direction au hasard
-            #  0    -> En avant
-            #  1   -> À droite
-            #  2    -> À gauche
+            r = random.randint(0, 2)  # Pick a random direction
+            #  0    -> Forward
+            #  1   -> Right
+            #  2    -> Left
             start_index = -int(self.V_NB_LINES / 2) + 1
             end_index = start_index + self.V_NB_LINES - 1
 
-            #  Évite que le chemin sort de la grille
+            #  Prevent the path from leaving the grid
             if last_x <= start_index:
                 r = 1
             if last_x >= end_index - 1:
                 r = 2
 
-            self.tiles_coordinates.append((last_x, last_y))  # Génère une tuile en avant
-            if r == 1:  # À droite
+            self.tiles_coordinates.append((last_x, last_y))  # Generate one tile forward
+            if r == 1:  # Add a tile to the right
                 last_x += 1
                 self.tiles_coordinates.append((last_x, last_y))
                 last_y += 1
                 self.tiles_coordinates.append((last_x, last_y))
-            if r == 2:  # À gauche
+            if r == 2:  # Add a tile to the left
                 last_x -= 1
                 self.tiles_coordinates.append((last_x, last_y))
                 last_y += 1
@@ -279,7 +285,7 @@ class MainWidget(RelativeLayout):
         self.update_ship()
 
         if not self.state_game_over and self.state_game_has_started:
-            #  Vitesse du jeu
+            #  Set game speed and make it constant regardless of app window size
             speed_y = self.SPEED * self.height / 100
             self.current_offset_y += speed_y * time_factor
 
@@ -290,11 +296,11 @@ class MainWidget(RelativeLayout):
                 self.score_txt = "SCORE: " + str(self.current_y_loop)
                 self.generate_tiles_coordinates()
 
-            #  Vitesse du vaisseau
+            #  Ship speed
             speed_x = self.current_speed_x * self.width / 100
             self.current_offset_x += speed_x * time_factor
 
-        #  Vérifier si le vaisseau est sorti de piste
+        #  Check if ship went off path
         if not self.check_ship_collisions() and not self.state_game_over:
             self.menu_title = "G  A  M  E     O  V  E  R"
             self.menu_button = "RESTART"
